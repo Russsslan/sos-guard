@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>SOS Guard</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="app-header">
+    <h1 class="logo-text">SOS Guard</h1>
+  </header>
+
+  <main class="container">
+    <!-- 🆘 SOS Tab -->
+    <section id="sosTab" class="tab-screen active" data-tab-screen="sos">
+      <div class="card">
+        <button id="sosBtn" class="sos-main-btn">🆘 Я В ОПАСНОСТИ</button>
+        <div id="sosCoords" class="coord-display">📍 Координаты: ожидание...</div>
+        <div class="emergency-grid">
+          <a href="tel:112"><button>📞 112</button></a>
+          <a href="tel:101"><button>🚒 101</button></a>
+          <a href="tel:102"><button>🚔 102</button></a>
+          <a href="tel:103"><button>🚑 103</button></a>
+        </div>
+      </div>
+      <div class="card">
+        <h3 style="margin:0 0 8px;">📋 Быстрые действия</h3>
+        <button id="copyCoordsBtn" class="ghost">📋 Копировать координаты</button>
+        <button id="vibrateSOSBtn" class="warning" style="margin-top:8px;">📳 Сигнал SOS</button>
+      </div>
+    </section>
+
+    <!-- 👥 Contacts Tab -->
+    <section id="contactsTab" class="tab-screen" data-tab-screen="contacts">
+      <div class="card">
+        <h2 style="margin:0 0 10px;">📇 Экстренные контакты</h2>
+        <form id="contactForm" class="grid-form">
+          <input id="contactName" placeholder="Имя (напр. Мама)" required>
+          <input id="contactPhone" type="tel" placeholder="+7..." required>
+          <button type="submit" class="primary">➕ Добавить</button>
+        </form>
+        <ul id="contactList" class="list" style="margin-top:12px;"></ul>
+      </div>
+    </section>
+
+    <!-- 🗺️ Map Tab -->
+    <section id="mapTab" class="tab-screen" data-tab-screen="map">
+      <div class="card">
+        <h2 style="margin:0 0 8px;">📍 Геолокация</h2>
+        <div id="mapCoords" class="coord-display">Координаты: не получены</div>
+        <div class="split-row">
+          <button id="detectBtn" class="ghost">📡 Определить</button>
+          <button id="openMapsBtn" class="ghost" disabled>🌐 Открыть в картах</button>
+        </div>
+      </div>
+      <div class="card">
+        <h2 style="margin:0 0 8px;">🏠 Сохранённые точки</h2>
+        <form id="placeForm" class="grid-form">
+          <input id="placeTitle" placeholder="Название" required>
+          <input id="placeAddress" placeholder="Адрес / Примечание" required>
+          <button type="submit" class="ghost">💾 Сохранить</button>
+        </form>
+        <ul id="placeList" class="list" style="margin-top:12px;"></ul>
+      </div>
+    </section>
+
+    <!-- ⚙️ Settings Tab -->
+    <section id="settingsTab" class="tab-screen" data-tab-screen="settings">
+      <div class="card">
+        <h2 style="margin:0 0 10px;">⚙️ Данные и экспорт</h2>
+        <button id="btnExport" class="ghost" style="margin-bottom:8px;">📥 Скачать бэкап (.json)</button>
+        <label class="ghost" style="display:flex; justify-content:center; margin-bottom:8px;">
+          📤 Восстановить из файла <input type="file" id="btnImport" accept=".json" style="display:none;">
+        </label>
+        <button id="btnExportVcf" class="ghost">📇 Экспорт контактов (.vcf)</button>
+        <button id="btnReset" class="danger" style="margin-top:8px;">🗑️ Полный сброс</button>
+      </div>
+      <p class="muted" style="text-align:center; margin-top:12px;">SOS Guard v2.0 | Оффлайн-first</p>
+    </section>
+  </main>
+
+  <nav class="bottom-nav">
+    <button class="nav-item active" data-tab="sos">🆘<span>SOS</span></button>
+    <button class="nav-item" data-tab="contacts">👥<span>Контакты</span></button>
+    <button class="nav-item" data-tab="map">🗺️<span>Карта</span></button>
+    <button class="nav-item" data-tab="settings">⚙️<span>Настройки</span></button>
+  </nav>
+
+  <div class="toast-container"></div>
+  <script src="app.js"></script>
+</body>
+</html>
