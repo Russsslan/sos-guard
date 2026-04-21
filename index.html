@@ -10,6 +10,7 @@
 <body>
   <header class="app-header">
     <h1 class="logo-text">SOS Guard</h1>
+    <div id="networkStatus" class="network-status" style="margin:6px auto 10px;display:inline-flex;align-items:center;padding:5px 10px;border-radius:999px;font-size:12px;background:#101522;border:1px solid var(--stroke);">Проверка...</div>
   </header>
 
   <main class="container">
@@ -74,7 +75,6 @@
         <label class="ghost" style="display:flex; justify-content:center; margin-bottom:8px;">
           📤 Восстановить из файла <input type="file" id="btnImport" accept=".json" style="display:none;">
         </label>
-        <button id="btnExportVcf" class="ghost">📇 Экспорт контактов (.vcf)</button>
         <button id="btnReset" class="danger" style="margin-top:8px;">🗑️ Полный сброс</button>
       </div>
       <p class="muted" style="text-align:center; margin-top:12px;">SOS Guard v2.0 | Оффлайн-first</p>
