@@ -331,47 +331,64 @@ function setupSettings() {
   document.getElementById("btnInstall")?.addEventListener("click", async () => { if (prompt) { prompt.prompt(); prompt = null; } });
 }
 
-// 🆘 SOS Logic (FIXED & ROBUST)
+// 🆘 SOS Logic (Bulletproof)
 function setupSOS() {
   const sosBtn = document.querySelector('.sos-call-grid .emergency-main') || document.getElementById('sosBtn');
   if (!sosBtn) return;
 
+  // Загружаем последние координаты из памяти (работает в оффлайне)
+  let lastCoords = localStorage.getItem('sos_last_coords') || 'Н/Д (GPS недоступен)';
+
   sosBtn.addEventListener('click', async () => {
-    vibrate([100, 50, 100]);
-    toast('📡 Получаю координаты...', 'warning');
+    vibrate([80, 40, 80]);
+    const originalText = sosBtn.textContent;
+    sosBtn.disabled = true;
+    sosBtn.textContent = '⏳ Готовлю сообщение...';
 
     try {
-      // 1. Get Coordinates
-      const coords = await new Promise((resolve, reject) => {
-        if (!navigator.geolocation) { reject('GPS не поддерживается'); return; }
-        navigator.geolocation.getCurrentPosition(
-          pos => resolve(`${pos.coords.latitude.toFixed(6)}, ${pos.coords.longitude.toFixed(6)}`),
-          () => reject('Ошибка GPS или отказ в правах'),
-          { enableHighAccuracy: true, timeout: 8000 }
-        );
-      });
+      // 1. Пытаемся получить свежие координаты (не блокирует остальной процесс)
+      let coords = lastCoords;
+      if (navigator.geolocation) {
+        try {
+          const pos = await new Promise((res, rej) => {
+            navigator.geolocation.getCurrentPosition(res, rej, { enableHighAccuracy: true, timeout: 5000 });
+          });
+          coords = `${pos.coords.latitude.toFixed(6)}, ${pos.coords.longitude.toFixed(6)}`;
+          localStorage.setItem('sos_last_coords', coords); // Сохраняем для будущего
+        } catch (e) {
+          console.warn('GPS fallback:', e);
+          coords = lastCoords; // Если не вышло, берем старые или "Н/Д"
+        }
+      }
 
-      // 2. Get Favorite Contacts
+      // 2. Берем избранные контакты
       const contacts = await db.getAll(STORE.contacts);
       const favorites = contacts.filter(c => c.isFavorite);
       const phones = favorites.map(c => c.phone.replace(/\D/g, '')).filter(Boolean);
 
-      // 3. Form Message
-      const msg = `🆘 SOS! Я в опасности!\nКоординаты: ${coords}\nСрочно помогите!`;
+      // 3. Формируем текст
+      const msg = `🆘 SOS! Я в опасности!\nКоординаты: ${coords}\nСрочно вызовите помощь!`;
 
-      // 4. Open SMS App (Cross-platform fix)
-      if (phones.length > 0) {
-        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-        const separator = isIOS ? '&' : '?';
-        const uri = `sms:${phones.join(',')}${separator}body=${encodeURIComponent(msg)}`;
-        window.location.href = uri;
-      } else {
-        window.location.href = `sms:?body=${encodeURIComponent(msg)}`;
-        toast('⚠️ Добавь избранные контакты (★) для быстрой отправки!', 'warning');
-      }
+      // 4. Формируем ссылку (iOS требует &, Android ?)
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      const sep = isIOS ? '&' : '?';
+      const uri = phones.length > 0
+        ? `sms:${phones.join(',')}${sep}body=${encodeURIComponent(msg)}`
+        : `sms:${sep}body=${encodeURIComponent(msg)}`;
+
+      // 5. Надежное открытие (через клик, а не window.location)
+      const a = document.createElement('a');
+      a.href = uri;
+      a.click();
+      a.remove();
+
+      toast('📱 Открываю сообщения...', 'success');
     } catch (err) {
       console.error('SOS Error:', err);
-      toast('❌ Не удалось открыть SMS. Скопируйте координаты вручную.', 'error');
+      toast('⚠️ Не удалось открыть SMS. Используйте кнопку "Копировать координаты".', 'warning');
+    } finally {
+      sosBtn.disabled = false;
+      sosBtn.textContent = originalText;
     }
   });
 }
