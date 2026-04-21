@@ -1,4 +1,4 @@
-const CACHE_NAME = "appoff-v1";
+const CACHE_NAME = "sosguard-v1";
 const ASSETS = ["./", "./index.html", "./styles.css", "./app.js", "./manifest.json"];
 
 self.addEventListener("install", (event) => {
